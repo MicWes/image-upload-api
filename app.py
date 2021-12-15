@@ -1,17 +1,15 @@
 import os
 import requests
 from flask import Flask, render_template, request, jsonify
+from PIL import Image
 
 # pylint: disable=C0103
 app = Flask(__name__)
 
-
 @app.route('/')
 def hello():
-    """Return a friendly HTTP greeting."""
-    message = "It's running!"
+    message = "Image upload is running!"
 
-    """Get Cloud Run environment variables."""
     service = os.environ.get('K_SERVICE', 'Unknown service')
     revision = os.environ.get('K_REVISION', 'Unknown revision')
 
@@ -44,9 +42,10 @@ def image_up():
         q.enqueue(image)
         try:
             #request resize
+            img = q.dequeue()
             url_resize = "http://127.0.0.1:5000/resize"
-            requests.post(url_resize, files={'image' : image})
-            return 'image', 200
+            requests.post(url_resize, files={'image' : img})
+            return 'image upload queue', 200
         except:
             return 'error', 500
     else:
@@ -55,8 +54,12 @@ def image_up():
 @app.route('/resize', methods=['POST'])
 def resize():
     image = request.files['image']
-    #resizing
+    
     if image:
+        #resizing
+        img = Image.open(image)
+        new_img = img.resize((384, 384))
+        new_img.save('image_384.jpg')
         return 'ok', 200
     else:
         return 'error', 500
