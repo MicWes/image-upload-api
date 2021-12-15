@@ -1,5 +1,5 @@
 import os
-
+import requests
 from flask import Flask, render_template, request, jsonify
 
 # pylint: disable=C0103
@@ -42,8 +42,13 @@ def image_up():
     if image:
         q = Queue() #instance
         q.enqueue(image)
-        #request
-        return 'image', 200
+        try:
+            #request resize
+            url_resize = "http://127.0.0.1:5000/resize"
+            requests.post(url_resize, files={'image' : image})
+            return 'image', 200
+        except:
+            return 'error', 500
     else:
         return 'error', 404
 
@@ -51,7 +56,10 @@ def image_up():
 def resize():
     image = request.files['image']
     #resizing
-    return
+    if image:
+        return 'ok', 200
+    else:
+        return 'error', 500
 
 if __name__ == '__main__':
     server_port = os.environ.get('PORT', '8080')
