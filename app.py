@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
 
 # pylint: disable=C0103
 app = Flask(__name__)
@@ -20,9 +20,37 @@ def hello():
         Service=service,
         Revision=revision)
 
-@app.route('/imgup')
+class Queue: #FIFO
+    def __init__(self):
+        self.items = []
+
+    def isEmpty(self):
+        return self.items == []
+
+    def enqueue(self, item):
+        self.items.insert(0,item)
+
+    def dequeue(self):
+        return self.items.pop()
+
+    def size(self):
+        return len(self.items)
+
+@app.route('/imgup', methods=['POST'])
 def image_up():
-    
+    image = request.files['image']
+    if image:
+        q = Queue() #instance
+        q.enqueue(image)
+        #request
+        return 'image', 200
+    else:
+        return 'error', 404
+
+@app.route('/resize', methods=['POST'])
+def resize():
+    image = request.files['image']
+    #resizing
     return
 
 if __name__ == '__main__':
