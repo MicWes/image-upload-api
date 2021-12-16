@@ -34,17 +34,24 @@ class Queue: #FIFO
     def size(self):
         return len(self.items)
 
+q = Queue() #instance queue
+
 @app.route('/imgup', methods=['POST'])
 def image_up():
     image = request.files['image']
     if image:
-        q = Queue() #instance
         q.enqueue(image)
         try:
             #request resize
             img = q.dequeue()
-            url_resize = "http://127.0.0.1:5000/resize"
-            requests.post(url_resize, files={'image' : img})
+            
+            size = request.args.get("size")
+            if size:
+                url_resize = "http://127.0.0.1:5000/resize?size=" + size
+                requests.post(url_resize, files={'image' : img}, json={'size' : size})
+            else:
+                url_resize = "http://127.0.0.1:5000/resize"
+                requests.post(url_resize, files={'image' : img})
             return 'image upload queue', 200
         except:
             return 'error', 500
@@ -58,8 +65,13 @@ def resize():
     if image:
         #resizing
         img = Image.open(image)
-        new_img = img.resize((384, 384))
-        new_img.save('image_384.jpg')
+        size = request.args.get("size")
+        if size:
+            new_img = img.resize((int(size), int(size)))
+            new_img.save('image_'+ str(size) +'.jpg')
+        else:
+            new_img = img.resize((384, 384))
+            new_img.save('image_384.jpg')
         return 'ok', 200
     else:
         return 'error', 500
