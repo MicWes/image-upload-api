@@ -1,6 +1,7 @@
 # Cloud Run Application - Docker
 ## Image Upload API
 ### Developed by Michael Wesley
+---
 
 ## After clone:
 * First Run: `python -m venv .venv`
