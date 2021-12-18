@@ -54,9 +54,9 @@ def image_up():
                 response = requests.post(url_resize, files={'image' : img})
             return Response(response.content, mimetype='image/jpg'), 200 #return image
         except:
-            return 'error', 500
+            return 'Error: system error.', 500
     else:
-        return 'error', 404
+        return 'Error: image not found.', 404
 
 @app.route('/resize', methods=['POST'])
 def resize():
@@ -75,7 +75,7 @@ def resize():
             new_img.save('image_384.jpg')
             return send_file('image_384.jpg', mimetype='image/jpg'), 200
     else:
-        return 'error', 500
+        return 'Error: image not found.', 500
 
 if __name__ == '__main__':
     server_port = os.environ.get('PORT', '8080')
