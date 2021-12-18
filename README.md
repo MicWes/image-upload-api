@@ -1,6 +1,6 @@
 # Image Upload API
 ### Cloud Run Application - Docker
-### Developed by Michael Wesley
+#### Developed by Michael Wesley
 ---
 
 ## After clone:
