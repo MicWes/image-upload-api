@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, Response, render_template, send_file, request
 from PIL import Image
 
 # pylint: disable=C0103
@@ -48,11 +48,11 @@ def image_up():
             size = request.args.get("size")
             if size:
                 url_resize = "http://127.0.0.1:5000/resize?size=" + size
-                requests.post(url_resize, files={'image' : img}, json={'size' : size})
+                response = requests.post(url_resize, files={'image' : img}, json={'size' : size})
             else:
                 url_resize = "http://127.0.0.1:5000/resize"
-                requests.post(url_resize, files={'image' : img})
-            return 'image upload queue', 200
+                response = requests.post(url_resize, files={'image' : img})
+            return Response(response.content, mimetype='image/jpg'), 200 #return image
         except:
             return 'error', 500
     else:
@@ -69,10 +69,11 @@ def resize():
         if size:
             new_img = img.resize((int(size), int(size)))
             new_img.save('image_'+ str(size) +'.jpg')
+            return send_file('image_'+ str(size) +'.jpg', mimetype='image/jpg'), 200
         else:
             new_img = img.resize((384, 384))
             new_img.save('image_384.jpg')
-        return 'ok', 200
+            return send_file('image_384.jpg', mimetype='image/jpg'), 200
     else:
         return 'error', 500
 
