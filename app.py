@@ -1,7 +1,6 @@
 import os
 import requests
-from flask import Flask, Response, render_template, send_file, request
-from PIL import Image
+from flask import Flask, Response, render_template, request
 
 # pylint: disable=C0103
 app = Flask(__name__)
@@ -57,25 +56,6 @@ def image_up():
             return 'Error: system error.', 500
     else:
         return 'Error: image not found.', 404
-
-@app.route('/resize', methods=['POST'])
-def resize():
-    image = request.files['image']
-    
-    if image:
-        #resizing
-        img = Image.open(image)
-        size = request.args.get("size")
-        if size:
-            new_img = img.resize((int(size), int(size)))
-            new_img.save('image_'+ str(size) +'.jpg')
-            return send_file('image_'+ str(size) +'.jpg', mimetype='image/jpg'), 200
-        else:
-            new_img = img.resize((384, 384))
-            new_img.save('image_384.jpg')
-            return send_file('image_384.jpg', mimetype='image/jpg'), 200
-    else:
-        return 'Error: image not found.', 500
 
 if __name__ == '__main__':
     server_port = os.environ.get('PORT', '8080')
